@@ -5,6 +5,7 @@ define Auth class
 from flask import request
 from typing import List, TypeVar
 from fnmatch import fnmatch
+import os
 
 
 class Auth:
@@ -50,3 +51,11 @@ class Auth:
         Retrieve the current user associated with a Flask request.
         """
         return None
+    
+    def session_cookie(self, request=None):
+        ''' returns a cookie value from a request'''
+        if request is None:
+            return None
+        cookie_name = os.environ.get('SESSION_NAME')
+        val = request.cookies.get(cookie_name)
+        return val
