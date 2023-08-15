@@ -51,7 +51,7 @@ class Auth:
         Retrieve the current user associated with a Flask request.
         """
         return None
-    
+
     def session_cookie(self, request=None):
         ''' returns a cookie value from a request'''
         if request is None:
