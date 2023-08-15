@@ -45,9 +45,6 @@ def before_request():
             not auth.session_cookie(request)):
         abort(401)
 
-    if not auth.authorization_header(request):
-        abort(401)
-
     if not request.current_user:
         abort(403)
 
