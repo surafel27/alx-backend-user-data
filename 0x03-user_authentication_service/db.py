@@ -18,7 +18,7 @@ class DB:
     def __init__(self) -> None:
         """Initialize a new DB instance
         """
-        self._engine = create_engine("sqlite:///a.db", echo=True)
+        self._engine = create_engine("sqlite:///a.db", echo=False)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
         self.__session = None
@@ -33,7 +33,8 @@ class DB:
         return self.__session
 
     def add_user(self, email: str, hashed_password: str) -> User:
-        """Add user to the users table on the database
+        """
+        Add a new user to the database.
         """
         user = User(email=email, hashed_password=hashed_password)
         self._session.add(user)
@@ -42,15 +43,31 @@ class DB:
         return user
 
     def find_user_by(self, **kwargs) -> User:
-        """Find user from the database
+        """
+        Find a user in the database using specified criteria.
         """
         if not kwargs:
             raise InvalidRequestError
-        cols = User.__table__.columns.keys()
+
+        columns = User.__table__.columns.keys()
         for key in kwargs.keys():
-            if key not in cols:
+            if key not in columns:
                 raise InvalidRequestError
-        user = self._session.query(User).filter_by(**kwargs).first()
-        if not user:
+        result = self._session.query(User).filter_by(**kwargs).first()
+        if not result:
             raise NoResultFound
-        return user
+        return result
+
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """
+        Update a user's information in the database.
+        """
+        user = self.find_user_by(id=user_id)
+        columns = User.__table__.columns.keys()
+        for key in kwargs.keys():
+            if key not in columns:
+                raise ValueError
+        for key, value in kwargs.items():
+            setattr(user, key, value)
+
+        self._session.commit()
